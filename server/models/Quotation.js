@@ -1,0 +1,4 @@
+import mongoose from 'mongoose';
+const item=new mongoose.Schema({description:String,quantity:{type:Number,default:1},unitRate:{type:Number,default:0},tax:{type:Number,default:0},discount:{type:Number,default:0},lineTotal:{type:Number,default:0}},{_id:false});
+const schema=new mongoose.Schema({quotationNumber:{type:String,unique:true,sparse:true},clientName:{type:String,required:true},clientAddress:String,contactPerson:String,date:{type:Date,default:Date.now},validUntil:Date,status:{type:String,enum:['Draft','Sent','Accepted','Rejected','Expired'],default:'Draft'},items:[item],subtotal:{type:Number,default:0},taxTotal:{type:Number,default:0},discountTotal:{type:Number,default:0},grandTotal:{type:Number,default:0},paymentTerms:String,deliveryTerms:String,notes:String},{timestamps:true});
+export default mongoose.model('Quotation',schema);
