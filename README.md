@@ -65,6 +65,10 @@ Run the server syntax check and production client build together:
 npm run check
 ```
 
+## Vercel deployment
+
+The repository includes a Vercel configuration for the Vite frontend, React Router fallbacks and Express serverless API. The public website can be previewed without a database; data-backed product, RFQ and staff features require `MONGO_URI`, `JWT_SECRET` and `CLIENT_URL` in the Vercel project environment.
+
 ## API routes
 
 Public:
