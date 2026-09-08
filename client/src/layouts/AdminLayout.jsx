@@ -1,5 +1,5 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { LayoutDashboard, Package, FileCheck2, FileText, Truck, WalletCards, LogOut, Inbox, PanelLeftClose } from 'lucide-react';
+import { LayoutDashboard, Package, FileCheck2, FileText, ReceiptText, Truck, WalletCards, LogOut, Inbox, PanelLeftClose } from 'lucide-react';
 import Brand from '../components/Brand';
 import {useAuth} from '../context/AuthContext';
 
@@ -9,6 +9,7 @@ const items = [
   {to:'tenders',label:'Tenders',Icon:FileCheck2,roles:['Director','Admin','Sales']},
   {to:'quotations',label:'Quotations',Icon:FileText,roles:['Director','Admin','Sales','Accounts']},
   {to:'challans',label:'Delivery Challans',Icon:Truck,roles:['Director','Admin','Inventory']},
+  {to:'invoices',label:'Sales Tax Invoices',Icon:ReceiptText,roles:['Director','Admin','Accounts']},
   {to:'payments',label:'Payments',Icon:WalletCards,roles:['Director','Admin','Accounts']},
   {to:'enquiries',label:'Enquiries',Icon:Inbox,roles:['Director','Admin','Sales']}
 ];

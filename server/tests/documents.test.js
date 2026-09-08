@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {tenderPayload} from '../routes/tenderRoutes.js';
 import {quotationPayload} from '../routes/quotationRoutes.js';
+import {challanPayload} from '../routes/challanRoutes.js';
+import {invoicePayload} from '../routes/invoiceRoutes.js';
 import {authorize} from '../middleware/authorize.js';
 
 const user={_id:'507f1f77bcf86cd799439011'};
@@ -40,6 +42,25 @@ test('quotation totals are recalculated from quantity, discount and tax rate',()
   assert.equal(result.taxTotal,18);
   assert.equal(result.grandTotal,198);
   assert.equal(result.items[0].lineTotal,198);
+});
+
+test('delivery challan payload keeps controlled batch and quantity fields',()=>{
+  const result=challanPayload({clientName:'Hospital',items:[
+    {productName:'Pressure line',orderedQuantity:12,quantity:10,batchNumber:'B-12',unit:'No.'}
+  ]},user);
+  assert.equal(result.items[0].quantity,10);
+  assert.equal(result.items[0].orderedQuantity,12);
+  assert.equal(result.items[0].batchNumber,'B-12');
+});
+
+test('sales tax invoice totals are recalculated on the server',()=>{
+  const result=invoicePayload({clientName:'Hospital',items:[
+    {description:'Pressure line',quantity:5,unitRate:1000,discount:500,taxRate:18}
+  ]},user);
+  assert.equal(result.subtotal,5000);
+  assert.equal(result.taxableTotal,4500);
+  assert.equal(result.salesTaxTotal,810);
+  assert.equal(result.grandTotal,5310);
 });
 
 test('role middleware blocks users outside the allowed business function',()=>{

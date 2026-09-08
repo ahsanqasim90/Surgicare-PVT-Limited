@@ -25,10 +25,12 @@ The application remains separated into `client/` and `server/`.
 
 - Staff login and protected React/API routes
 - Live overview for receipts, receivables, tenders, inventory and stock attention
-- Products, product-wise tender evaluation, itemised quotations, delivery challans, receivables and website enquiries
+- Products, product-wise tender evaluation, itemised quotations, delivery challans, sales-tax invoices, receivables and website enquiries
 - Reusable record-creation forms and honest empty states
 - Tender approval outcomes by product, approved quantity and approved rate
 - Quotation editor with server-calculated tax/discount totals and a print/PDF-ready view
+- Delivery challan editor with batch, manufacturing/expiry, dispatch and receiving details plus print/PDF view
+- Sales-tax invoice editor with NTN/STRN fields, server-calculated taxable value/tax and print/PDF view
 - Role-based API authorization, allowlisted business-document payloads and staff action audit logs
 - Atomic quotation and delivery-challan numbering
 
@@ -88,7 +90,7 @@ Public:
 - `POST /api/rfqs`
 - `POST /api/auth/login`
 
-Authenticated staff routes cover the dashboard, tenders, quotations, challans, payments, clients, RFQ review and product mutations.
+Authenticated staff routes cover the dashboard, tenders, quotations, challans, sales-tax invoices, payments, clients, RFQ review and product mutations.
 
 ## Content safeguards
 
@@ -98,8 +100,8 @@ The site intentionally does not invent certifications, clients, manufacturers, p
 
 - Add the verified product catalogue, media and technical files
 - Configure genuine company contact and leadership content
-- Complete the itemised delivery-challan builder and printable document
-- Add the sales-tax invoice workflow and an approved tax-compliant print template
+- Confirm final letterhead, legal details and tax wording with Surgicare's accountant/tax adviser
+- Connect approved quotation → challan → invoice → receivable creation
 - Extend the connected tender → order → stock → delivery → invoice → payment workflow
 - Add batch-level stock movements and configurable expiry alerts
 - Add an audit-history screen, MFA/session revocation and final production security review

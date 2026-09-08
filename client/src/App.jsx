@@ -18,6 +18,9 @@ import ProductDetail from './pages/ProductDetail';
 import StaffLogin from './pages/StaffLogin';
 import AdminEnquiries from './pages/AdminEnquiries';
 import QuotationPrint from './pages/QuotationPrint';
+import AdminInvoices from './pages/AdminInvoices';
+import ChallanPrint from './pages/ChallanPrint';
+import InvoicePrint from './pages/InvoicePrint';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -40,6 +43,9 @@ export default function App() {
         <Route path="quotations" element={<AdminQuotations />} />
         <Route path="quotations/:id/print" element={<QuotationPrint />} />
         <Route path="challans" element={<AdminChallans />} />
+        <Route path="challans/:id/print" element={<ChallanPrint />} />
+        <Route path="invoices" element={<AdminInvoices />} />
+        <Route path="invoices/:id/print" element={<InvoicePrint />} />
         <Route path="payments" element={<AdminPayments />} />
         <Route path="enquiries" element={<AdminEnquiries />} />
       </Route>

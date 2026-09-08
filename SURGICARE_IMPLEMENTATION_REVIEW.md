@@ -17,11 +17,11 @@
 Surgicare is not only a static company website. It is a custom-designed, full-stack platform with two connected parts:
 
 1. A public-facing corporate and product website for a medical and surgical supply company.
-2. A protected staff portal for managing products, tenders, quotations, delivery challans, receivables and customer enquiries.
+2. A protected staff portal for managing products, tenders, quotations, delivery challans, sales-tax invoices, receivables and customer enquiries.
 
 The application was built with React, Vite, Node.js, Express, MongoDB and Mongoose. It includes real database persistence, JWT-based authentication, protected frontend and backend routes, responsive layouts, reusable UI components, REST APIs, input validation, security middleware and a production Vercel deployment.
 
-The current version is best described as a **production-deployed full-stack MVP**. Its core architecture and major workflows are implemented and working. Product-wise tender evaluation, itemised quotations, print/PDF-ready quotation output, role-based API authorization, atomic document numbering and backend audit logging are implemented. Advanced features such as sales-tax invoices, full delivery-challan editing/printing, inventory transactions, MFA and verified final company content remain future work.
+The current version is best described as a **production-deployed full-stack MVP**. Its core architecture and major workflows are implemented and working. Product-wise tender evaluation, itemised quotations, full delivery-challan records, sales-tax invoice generation, print/PDF-ready documents, role-based API authorization, atomic document numbering and backend audit logging are implemented. Advanced features such as automatic cross-document conversion, inventory transactions, MFA and verified final company content remain future work.
 
 ## 2. What is fully implemented
 
@@ -60,6 +60,8 @@ The current version is best described as a **production-deployed full-stack MVP*
 - Product-wise tender approval outcomes, quantities and rates.
 - Itemised quotation creation/editing with server-calculated totals.
 - Browser print/PDF-ready quotation view.
+- Itemised delivery challan editor and print/PDF-ready dispatch document.
+- Sales-tax invoice editor with tax identity fields, server calculations and print/PDF-ready output.
 - Role-based API authorization and role-aware sidebar navigation.
 - Staff mutation audit logs.
 - Atomic quotation and delivery-challan number generation.
@@ -68,7 +70,7 @@ The current version is best described as a **production-deployed full-stack MVP*
 ### Backend and infrastructure
 
 - Express REST API separated from the React client.
-- Ten Mongoose models, including audit and atomic-counter support models.
+- Eleven Mongoose models, including sales-tax invoice, audit and atomic-counter support models.
 - Reusable CRUD controller and resource router.
 - Centralized error handling.
 - Request logging.
@@ -99,7 +101,8 @@ The current version is best described as a **production-deployed full-stack MVP*
 | `/admin/inventory` | Inventory | Product listing and opening-stock record creation | MVP implemented |
 | `/admin/tenders` | Tenders | Product-wise evaluation, approved quantity/rate, outcome summaries, filtering and editing | Implemented |
 | `/admin/quotations` | Quotations | Itemised create/edit workflow, calculated totals, atomic numbering and print/PDF-ready view | Implemented |
-| `/admin/challans` | Delivery | Challan listing, automatic number foundation and draft creation | MVP implemented |
+| `/admin/challans` | Delivery | Itemised challan create/edit, batch/expiry traceability, dispatch/receipt data and print view | Implemented |
+| `/admin/invoices` | Tax invoices | Itemised create/edit, NTN/STRN fields, server-calculated tax totals, atomic numbering and print view | Implemented; final legal template review required |
 | `/admin/payments` | Receivables | Amount, received amount, due date and derived payment status | MVP implemented |
 | `/admin/enquiries` | Customer enquiries | Displays RFQs submitted from the public website | Implemented |
 | `*` | Unknown route | Custom page-not-found response | Implemented |
@@ -271,12 +274,16 @@ The challan model supports:
 - Automatic challan numbers.
 - Client and procurement reference.
 - Delivery date.
-- Product, batch, quantity and unit line items.
+- Product, brand, batch, manufacturing/expiry, ordered/delivered quantity and unit line items.
 - Receiver name and contact.
-- Draft, Dispatched and Delivered states.
+- Draft, Ready, Dispatched, Partially Delivered, Delivered and Returned states.
 - Notes.
 
-The current UI creates and lists basic challan records. A full item builder, dispatch workflow and printable document are future work.
+The current UI creates and edits complete challan records and produces a letterhead-friendly receiving document that can be printed or saved as PDF.
+
+### Sales tax invoices
+
+The invoice workflow supports atomic invoice numbers, buyer/seller NTN and STRN fields, PO/reference data, multiple taxable items, discounts, per-line sales-tax rates, server-calculated totals, payment status and a letterhead-friendly print/PDF view. The supplied registration values and final wording must be verified by Surgicare's accountant or tax adviser before legal issuance.
 
 ### Payments and receivables
 
@@ -299,7 +306,7 @@ The quick-create form derives the initial payment status from the entered total 
 
 ## 6. Backend API review
 
-The application registers approximately 38 REST operations across the following resources:
+The application registers approximately 43 REST operations across the following resources:
 
 | Resource | Public operations | Protected operations |
 |---|---|---|
@@ -311,6 +318,7 @@ The application registers approximately 38 REST operations across the following 
 | Tenders | — | List, get, create, update, delete |
 | Quotations | — | List, get, create, update, delete |
 | Challans | — | List, get, create, update, delete |
+| Sales-tax invoices | — | List, get, create, update, delete |
 | Payments | — | List, get, create, update, delete |
 | Clients | — | List, get, create, update, delete |
 
@@ -326,7 +334,7 @@ The application registers approximately 38 REST operations across the following 
 
 ## 7. Database model review
 
-Ten MongoDB collections are represented through Mongoose models:
+Eleven MongoDB collections are represented through Mongoose models:
 
 1. `User` — authentication, roles and account state.
 2. `Product` — catalogue and inventory master data.
@@ -338,6 +346,7 @@ Ten MongoDB collections are represented through Mongoose models:
 8. `Client` — hospital/customer contact records.
 9. `AuditLog` — staff mutation history and actor/request metadata.
 10. `Counter` — atomic document-number sequences.
+11. `SalesTaxInvoice` — buyer/tax registration data, taxable line items and invoice totals.
 
 All models use automatic creation and update timestamps.
 
@@ -360,6 +369,8 @@ All models use automatic creation and update timestamps.
 | `TenderEditor` | Product-wise tender submission and evaluation editor |
 | `QuotationEditor` | Itemised quotation editor with live totals |
 | `QuotationPrint` | Letterhead-friendly quotation print/PDF view |
+| `ChallanEditor` / `ChallanPrint` | Traceable delivery workflow and receiving document |
+| `InvoiceEditor` / `InvoicePrint` | Sales-tax calculation workflow and printable tax invoice |
 
 ## 9. UI, responsive design and accessibility
 
@@ -441,7 +452,7 @@ The following checks were completed through 8 September 2026:
 - Production React/Vite build passed.
 - 1,600 frontend modules transformed successfully.
 - Production bundle generated successfully.
-- Five automated business-rule/authorization tests passed.
+- Seven automated business-rule/authorization tests passed.
 - Authenticated tender and quotation API reads passed against the connected database.
 - Client dependency audit: 0 known vulnerabilities.
 - Server dependency audit: 0 known vulnerabilities.
@@ -467,8 +478,8 @@ These checks confirm build integrity, core document calculations and basic runti
 - Edit/delete controls across every remaining admin module.
 - Dedicated client-management screen.
 - Final approved quotation letterhead/company details.
-- Sales-tax invoice builder, numbering, tax validation and print/PDF output.
-- Full challan item builder and printable delivery document.
+- Accountant/tax-adviser approval of the final sales-tax invoice wording and required registrations.
+- Automatic quotation-to-challan-to-invoice document conversion.
 - Tender document uploads and attachment storage.
 - Inventory stock-in, stock-out and movement ledger.
 - Batch-level quantities and expiry alerts.
@@ -484,7 +495,7 @@ These checks confirm build integrity, core document calculations and basic runti
 - Some generic CRUD resources still accept broader schema-shaped request bodies; additional endpoint-specific validation is recommended.
 - Authorization is role-based, but permissions are not yet configurable per user or organisation.
 - Audit events are stored but do not yet have an admin viewer, retention policy or tamper-evident export.
-- Current automated tests cover the new tender, quotation and authorization rules; broader API and browser regression coverage is still required.
+- Current automated tests cover tender, quotation, challan, invoice and authorization rules; broader API and browser regression coverage is still required.
 - Authentication still uses a session-storage bearer token; higher-risk production use should consider HTTP-only cookies, MFA and session revocation.
 - SEO still needs page-specific metadata, sitemap, robots configuration and structured data.
 
@@ -514,24 +525,24 @@ These checks confirm build integrity, core document calculations and basic runti
 
 ### Short CV description
 
-Designed and developed a responsive full-stack MERN platform for a medical and surgical supply company, combining a public product/RFQ website with a JWT-protected staff portal for inventory, tenders, quotations, delivery challans, receivables and customer enquiries. Built the UI system from scratch, designed MongoDB schemas and REST APIs, and deployed the application to Vercel with MongoDB Atlas.
+Designed and developed a responsive full-stack MERN platform for a medical and surgical supply company, combining a public product/RFQ website with a JWT-protected staff portal for inventory, tenders, quotations, delivery challans, sales-tax invoices, receivables and customer enquiries. Built the UI system from scratch, designed MongoDB schemas and REST APIs, and deployed the application to Vercel with MongoDB Atlas.
 
 ### CV bullet points
 
 - Designed and built a production-deployed MERN platform from scratch using React, Vite, Node.js, Express, MongoDB and Mongoose.
 - Developed a responsive corporate website with dynamic product catalogue, category filtering, product detail pages and a database-backed RFQ workflow.
 - Implemented JWT authentication, bcrypt password hashing, protected frontend/API routes, role-based authorization, rate limiting, Helmet security headers and centralized error handling.
-- Created an authenticated operations dashboard with product-wise tender evaluation, itemised quotations, print-ready commercial documents, inventory monitoring, delivery challans, receivables and website enquiries.
-- Designed MongoDB domain models and approximately 38 REST operations, including reusable CRUD architecture, atomic numbering, audit logging and server-calculated business metrics.
+- Created an authenticated operations portal with product-wise tender evaluation, itemised quotations, traceable delivery challans, sales-tax invoices, print-ready documents, inventory monitoring, receivables and website enquiries.
+- Designed eleven MongoDB models and approximately 43 REST operations, including reusable CRUD architecture, atomic numbering, audit logging and server-calculated business metrics.
 - Configured Git/GitHub version control, Vercel serverless deployment, SPA routing and MongoDB Atlas integration.
 
 ### Compact one-line version
 
-Built and deployed a custom MERN medical-supply platform featuring a responsive corporate website, MongoDB-backed RFQs and products, JWT staff authentication, and operational modules for tenders, quotations, inventory, deliveries and receivables.
+Built and deployed a custom MERN medical-supply platform featuring a responsive corporate website, MongoDB-backed RFQs and products, JWT staff authentication, and operational modules for tenders, quotations, inventory, delivery challans, sales-tax invoices and receivables.
 
 ## 16. Portfolio/GitHub description
 
-Surgicare is a custom full-stack MERN platform for medical and surgical institutional supply. It combines a responsive public corporate website and dynamic product/RFQ experience with a secure operations portal covering inventory, tenders, quotations, delivery challans, receivables and customer enquiries. The system uses React, Vite, Express, MongoDB, Mongoose, JWT authentication and a Vercel serverless deployment.
+Surgicare is a custom full-stack MERN platform for medical and surgical institutional supply. It combines a responsive public corporate website and dynamic product/RFQ experience with a secure operations portal covering inventory, tenders, quotations, delivery challans, sales-tax invoices, receivables and customer enquiries. The system uses React, Vite, Express, MongoDB, Mongoose, JWT authentication and a Vercel serverless deployment.
 
 ## 17. Interview talking points
 
@@ -549,7 +560,7 @@ MERN allowed the frontend, API and database models to share a JavaScript-based d
 
 ### What would be built next?
 
-The next phase would add the full delivery-challan builder/print view, sales-tax invoice workflow, connected stock movements, audit-history UI, MFA/session controls and broader automated integration/end-to-end testing.
+The next phase would connect approved quotations to challans, invoices and receivables; add stock movements, audit-history UI, MFA/session controls, final accountant-approved tax wording and broader automated integration/end-to-end testing.
 
 ## 18. Skills demonstrated
 

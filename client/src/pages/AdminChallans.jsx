@@ -1,7 +1,18 @@
 import {useEffect,useState} from 'react';
+import {ExternalLink,Pencil,Plus} from 'lucide-react';
+import {Link} from 'react-router-dom';
 import api from '../services/api';
-import AdminTable from '../components/AdminTable';
-import QuickCreateModal from '../components/QuickCreateModal';
+import ChallanEditor from '../components/ChallanEditor';
 
-const fields=[{name:'clientName',label:'Client / hospital',required:true},{name:'reference',label:'PO / tender reference'},{name:'deliveryDate',label:'Delivery date',type:'date'}];
-export default function AdminChallans(){const [rows,setRows]=useState([]);const [open,setOpen]=useState(false);const [error,setError]=useState('');const load=()=>api.get('/challans').then(setRows).catch(err=>setError(err.message));useEffect(()=>{void load()},[]);const add=async values=>{await api.post('/challans',{...values,status:'Draft'});load()};return <div className="admin-page"><div className="admin-top"><div><span className="eyebrow">DELIVERY</span><h1>Delivery challans</h1><p>Delivery records linked to clients, items, batches and procurement references.</p></div><button className="btn" onClick={()=>setOpen(true)}>+ New challan</button></div>{error&&<div className="form-message error">{error}</div>}<div className="panel"><AdminTable rows={rows} columns={[{key:'challanNumber',label:'Challan No.'},{key:'clientName',label:'Client'},{key:'reference',label:'PO / Tender Ref.'},{key:'deliveryDate',label:'Delivery Date',render:r=>r.deliveryDate?new Date(r.deliveryDate).toLocaleDateString():'—'},{key:'status',label:'Status'}]}/></div>{open&&<QuickCreateModal title="Create delivery challan" description="Start with the confirmed client and source reference." fields={fields} onClose={()=>setOpen(false)} onSubmit={add}/>}</div>}
+const date=value=>value?new Date(value).toLocaleDateString():'—';
+export default function AdminChallans(){
+  const [rows,setRows]=useState([]);const [editor,setEditor]=useState(null);const [error,setError]=useState('');
+  const load=async()=>{setError('');try{setRows(await api.get('/challans'))}catch(err){setError(err.message)}};
+  useEffect(()=>{void load()},[]);
+  const save=async values=>{if(editor?.record)await api.put(`/challans/${editor.record._id}`,values);else await api.post('/challans',values);setEditor(null);await load()};
+  return <div className="admin-page"><div className="admin-top"><div><span className="eyebrow">DELIVERY CONTROL</span><h1>Delivery challan workspace</h1><p>Trace products, batches, dispatch details and receiving acknowledgement.</p></div><button className="btn" onClick={()=>setEditor({record:null})}><Plus size={17}/> New challan</button></div>
+    {error&&<div className="form-message error">{error}</div>}
+    <div className="panel record-panel"><div className="panel-head"><h3>Delivery register</h3><span>{rows.length} document{rows.length===1?'':'s'}</span></div><div className="table-wrap"><table><thead><tr><th>Challan</th><th>Client</th><th>PO / reference</th><th>Delivery</th><th>Items</th><th>Batches</th><th>Status</th><th>Actions</th></tr></thead><tbody>{rows.length?rows.map(row=><tr key={row._id}><td><b>{row.challanNumber}</b><small>{row.vehicleNumber||row.transporter||'No transport detail'}</small></td><td>{row.clientName}</td><td>{row.purchaseOrderNumber||row.reference||'—'}</td><td>{date(row.deliveryDate)}</td><td>{row.items?.length||0}</td><td>{row.items?.filter(item=>item.batchNumber).length||0}</td><td><span className={`record-status status-${row.status.toLowerCase().replaceAll(' ','-')}`}>{row.status}</span></td><td><div className="table-actions"><button className="table-action" onClick={()=>setEditor({record:row})}><Pencil size={15}/> Edit</button><Link className="table-action" to={`/admin/challans/${row._id}/print`}><ExternalLink size={15}/> Print</Link></div></td></tr>):<tr><td colSpan="8" className="table-empty">No delivery challans have been created yet.</td></tr>}</tbody></table></div></div>
+    {editor&&<ChallanEditor record={editor.record} onClose={()=>setEditor(null)} onSave={save}/>}
+  </div>;
+}
