@@ -8,6 +8,7 @@
     "start": "npm run start --prefix server",
     "build": "npm run build --prefix client",
     "check": "npm run check --prefix server && npm run build --prefix client",
+    "test": "npm run test --prefix server",
     "create-admin": "npm run create-admin --prefix server"
   },
   "devDependencies": {

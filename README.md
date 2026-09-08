@@ -25,9 +25,12 @@ The application remains separated into `client/` and `server/`.
 
 - Staff login and protected React/API routes
 - Live overview for receipts, receivables, tenders, inventory and stock attention
-- Products, tenders, quotations, delivery challans, receivables and website enquiries
+- Products, product-wise tender evaluation, itemised quotations, delivery challans, receivables and website enquiries
 - Reusable record-creation forms and honest empty states
-- Automatic quotation and delivery-challan numbering foundations
+- Tender approval outcomes by product, approved quantity and approved rate
+- Quotation editor with server-calculated tax/discount totals and a print/PDF-ready view
+- Role-based API authorization, allowlisted business-document payloads and staff action audit logs
+- Atomic quotation and delivery-challan numbering
 
 ## Local setup
 
@@ -65,6 +68,12 @@ Run the server syntax check and production client build together:
 npm run check
 ```
 
+Run the business-rule and authorization tests:
+
+```bash
+npm test
+```
+
 ## Vercel deployment
 
 The repository includes a Vercel configuration for the Vite frontend, React Router fallbacks and Express serverless API. The public website can be previewed without a database; data-backed product, RFQ and staff features require `MONGO_URI`, `JWT_SECRET` and `CLIENT_URL` in the Vercel project environment.
@@ -89,7 +98,8 @@ The site intentionally does not invent certifications, clients, manufacturers, p
 
 - Add the verified product catalogue, media and technical files
 - Configure genuine company contact and leadership content
-- Match printable quotation/challan documents to approved samples
+- Complete the itemised delivery-challan builder and printable document
+- Add the sales-tax invoice workflow and an approved tax-compliant print template
 - Extend the connected tender → order → stock → delivery → invoice → payment workflow
-- Add batch-level stock movements, configurable expiry alerts and audit logging
-- Introduce finer role permissions after real team responsibilities are confirmed
+- Add batch-level stock movements and configurable expiry alerts
+- Add an audit-history screen, MFA/session revocation and final production security review
