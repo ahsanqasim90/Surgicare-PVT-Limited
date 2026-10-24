@@ -11,7 +11,7 @@ const lineSchema=new mongoose.Schema({
 
 const schema=new mongoose.Schema({
   voucherNumber:{type:String,required:true,unique:true,index:true},
-  voucherType:{type:String,enum:['Journal','Cash Payment','Cash Receipt','Bank Payment','Bank Receipt','Expense','Advance Payment','Advance Settlement','Advance Refund','Reversal'],required:true,index:true},
+  voucherType:{type:String,enum:['Journal','Cash Payment','Cash Receipt','Bank Payment','Bank Receipt','Expense','Advance Payment','Advance Settlement','Advance Refund','Supplier Invoice','Supplier Payment','Reversal'],required:true,index:true},
   postingDate:{type:Date,default:Date.now,index:true},
   partyName:{type:String,trim:true,maxLength:240,index:true},
   reference:{type:String,trim:true,maxLength:160,index:true},

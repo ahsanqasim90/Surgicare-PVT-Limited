@@ -19,7 +19,7 @@ router.use(financeRoles);
 
 const defaultAccounts=[
   ['1000','Cash in Hand','Cash'],['1010','Main Bank Account','Bank'],['1100','Accounts Receivable','Asset'],
-  ['1200','Inventory','Asset'],['1300','Supplier Advances','Asset'],['1310','Employee Advances','Asset'],
+  ['1200','Inventory','Asset'],['1210','Input Sales Tax','Asset'],['1300','Supplier Advances','Asset'],['1310','Employee Advances','Asset'],
   ['1320','Tender and Project Advances','Asset'],['1330','Security Deposits','Asset'],['2000','Accounts Payable','Liability'],
   ['2100','Sales Tax Payable','Tax'],['4000','Sales Revenue','Income'],['5000','Cost of Goods Sold','Expense'],
   ['6000','General Expenses','Expense'],['6010','Freight and Delivery','Expense'],['6020','Tender Expenses','Expense'],

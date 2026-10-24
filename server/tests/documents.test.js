@@ -6,6 +6,7 @@ import {challanPayload} from '../routes/challanRoutes.js';
 import {invoicePayload} from '../routes/invoiceRoutes.js';
 import {authorize} from '../middleware/authorize.js';
 import {calculateLedgerAmounts,deriveAdvanceStatus} from '../routes/financeRoutes.js';
+import {calculatePurchaseItems,derivePurchaseOrderStatus,supplierInvoicePayload} from '../routes/procurementRoutes.js';
 
 const user={_id:'507f1f77bcf86cd799439011'};
 
@@ -86,4 +87,25 @@ test('advance settlement derives partial, settled and refunded states',()=>{
   assert.deepEqual(deriveAdvanceStatus(10000,3000,0),{status:'Partially Settled',outstandingAmount:7000});
   assert.deepEqual(deriveAdvanceStatus(10000,10000,0),{status:'Settled',outstandingAmount:0});
   assert.deepEqual(deriveAdvanceStatus(10000,0,10000),{status:'Refunded',outstandingAmount:0});
+});
+
+test('purchase order values are recalculated from controlled line inputs',()=>{
+  const result=calculatePurchaseItems([{productName:'Pressure line',quantity:10,unitCost:500,discount:200,taxRate:18}]);
+  assert.equal(result.subtotal,5000);
+  assert.equal(result.discountTotal,200);
+  assert.equal(result.taxTotal,864);
+  assert.equal(result.grandTotal,5664);
+});
+
+test('purchase order receipt status follows accepted cumulative quantities',()=>{
+  assert.equal(derivePurchaseOrderStatus([{quantity:10,receivedQuantity:0}]),'Ordered');
+  assert.equal(derivePurchaseOrderStatus([{quantity:10,receivedQuantity:4}]),'Partially Received');
+  assert.equal(derivePurchaseOrderStatus([{quantity:10,receivedQuantity:10}]),'Received');
+});
+
+test('supplier invoice total cannot be supplied by the browser',()=>{
+  const supplier={_id:'507f1f77bcf86cd799439012',name:'Verified Supplier'};
+  const result=supplierInvoicePayload({supplierInvoiceNumber:'INV-10',grandTotal:1,items:[{productName:'Cannula',quantity:2,unitCost:1000,taxRate:18}]},supplier);
+  assert.equal(result.grandTotal,2360);
+  assert.equal(result.supplierName,'Verified Supplier');
 });

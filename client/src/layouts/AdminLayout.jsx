@@ -1,11 +1,12 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { LayoutDashboard, Package, FileCheck2, FileText, ReceiptText, Truck, WalletCards, LogOut, Inbox, PanelLeftClose, Landmark } from 'lucide-react';
+import { LayoutDashboard, Package, FileCheck2, FileText, ReceiptText, Truck, WalletCards, LogOut, Inbox, PanelLeftClose, Landmark, ShoppingCart } from 'lucide-react';
 import Brand from '../components/Brand';
 import {useAuth} from '../context/AuthContext';
 
 const items = [
   {to:'',label:'Overview',Icon:LayoutDashboard},
   {to:'inventory',label:'Inventory',Icon:Package,roles:['Director','Admin','Inventory']},
+  {to:'procurement',label:'Purchasing',Icon:ShoppingCart,roles:['Director','Admin','Inventory','Accounts']},
   {to:'tenders',label:'Tenders',Icon:FileCheck2,roles:['Director','Admin','Sales']},
   {to:'quotations',label:'Quotations',Icon:FileText,roles:['Director','Admin','Sales','Accounts']},
   {to:'challans',label:'Delivery Challans',Icon:Truck,roles:['Director','Admin','Inventory']},

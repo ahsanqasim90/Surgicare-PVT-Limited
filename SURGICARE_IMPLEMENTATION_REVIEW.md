@@ -21,7 +21,7 @@ Surgicare is not only a static company website. It is a custom-designed, full-st
 
 The application was built with React, Vite, Node.js, Express, MongoDB and Mongoose. It includes real database persistence, JWT-based authentication, protected frontend and backend routes, responsive layouts, reusable UI components, REST APIs, input validation, security middleware and a production Vercel deployment.
 
-The current version is best described as a **production-deployed full-stack operations and finance MVP**. Its core architecture and major workflows are implemented and working. Product-wise tender evaluation, itemised quotations, full delivery-challan records, sales-tax invoice generation, print/PDF-ready documents, a double-entry daily ledger, expense approvals, advance-payment settlement, role-based API authorization, atomic document numbering and backend audit logging are implemented. Advanced features such as automatic cross-document conversion, inventory transactions, MFA and verified final company content remain future work.
+The current version is best described as a **production-deployed full-stack operations, procurement and finance MVP**. Its core architecture and major workflows are implemented and working. Product-wise tender evaluation, itemised quotations, delivery challans, sales-tax invoices, supplier management, controlled purchase orders, goods-receipt posting, stock movements, supplier payables, a double-entry daily ledger, expense approvals, advance-payment settlement, role-based API authorization, atomic document numbering and backend audit logging are implemented. Advanced features such as automatic sales-document conversion, MFA and verified final company content remain future work.
 
 ## 2. What is fully implemented
 
@@ -63,6 +63,9 @@ The current version is best described as a **production-deployed full-stack oper
 - Itemised delivery challan editor and print/PDF-ready dispatch document.
 - Sales-tax invoice editor with tax identity fields, server calculations and print/PDF-ready output.
 - Finance control centre with daily ledger, chart of accounts, expense approvals and advance-payment settlement.
+- Procurement control centre with supplier master data, purchase-order approvals, goods received notes, stock posting, supplier invoices and payments.
+- Immutable stock-movement history linked to posted and reversed goods receipts.
+- Accounts-payable posting with separate inventory, input-tax, payable and cash/bank ledger entries.
 - Balanced debit/credit validation, controlled posting and reversal-ready ledger architecture.
 - Role-based API authorization and role-aware sidebar navigation.
 - Staff mutation audit logs.
@@ -72,7 +75,7 @@ The current version is best described as a **production-deployed full-stack oper
 ### Backend and infrastructure
 
 - Express REST API separated from the React client.
-- Eleven Mongoose models, including sales-tax invoice, audit and atomic-counter support models.
+- Twenty Mongoose models, including procurement, finance, audit and atomic-counter support models.
 - Reusable CRUD controller and resource router.
 - Centralized error handling.
 - Request logging.
@@ -101,6 +104,7 @@ The current version is best described as a **production-deployed full-stack oper
 | `/staff-login` | Staff authentication | Email/password login, error and loading states, return-to-requested-page navigation | Implemented |
 | `/admin` | Operations dashboard | Revenue, outstanding receivables, active tenders, inventory count, pipeline, upcoming payments and low-stock warning | Implemented |
 | `/admin/inventory` | Inventory | Product listing and opening-stock record creation | MVP implemented |
+| `/admin/procurement` | Purchasing and stock | Suppliers, approval-based POs, GRNs, stock ledger, supplier invoices and payable payments | Implemented |
 | `/admin/tenders` | Tenders | Product-wise evaluation, approved quantity/rate, outcome summaries, filtering and editing | Implemented |
 | `/admin/quotations` | Quotations | Itemised create/edit workflow, calculated totals, atomic numbering and print/PDF-ready view | Implemented |
 | `/admin/challans` | Delivery | Itemised challan create/edit, batch/expiry traceability, dispatch/receipt data and print view | Implemented |
@@ -288,6 +292,22 @@ The current UI creates and edits complete challan records and produces a letterh
 
 The invoice workflow supports atomic invoice numbers, buyer/seller NTN and STRN fields, PO/reference data, multiple taxable items, discounts, per-line sales-tax rates, server-calculated totals, payment status and a letterhead-friendly print/PDF view. The supplied registration values and final wording must be verified by Surgicare's accountant or tax adviser before legal issuance.
 
+### Procurement and supplier payables
+
+The purchasing workspace implements a controlled sequence from supplier to payment:
+
+- Supplier profiles with contact, NTN/STRN, address, banking and payment-term fields.
+- Purchase orders with server-calculated line totals, discounts and input tax.
+- Draft, submission, approval, issue, partial-receipt and full-receipt states.
+- Goods received notes tied to an issued PO and existing inventory products.
+- Over-receipt prevention and condition-based receipt handling.
+- Transactional GRN posting that increases stock and creates traceable stock-movement records.
+- Controlled GRN reversal that checks available stock and retains the original and reversal audit trail.
+- Supplier invoices linked to the correct supplier, PO and posted GRN.
+- Approval posting to Inventory, Input Sales Tax and Accounts Payable.
+- Partial/full supplier payments posted against a selected cash or bank account.
+- Live accounts-payable, overdue-invoice, open-PO and low-stock metrics.
+
 ### Payments and receivables
 
 The payment model supports:
@@ -309,7 +329,7 @@ The quick-create form derives the initial payment status from the entered total 
 
 ## 6. Backend API review
 
-The application registers approximately 43 REST operations across the following resources:
+The application registers more than 65 REST operations across the following resources:
 
 | Resource | Public operations | Protected operations |
 |---|---|---|
@@ -324,6 +344,8 @@ The application registers approximately 43 REST operations across the following 
 | Sales-tax invoices | — | List, get, create, update, delete |
 | Payments | — | List, get, create, update, delete |
 | Clients | — | List, get, create, update, delete |
+| Procurement | — | Supplier master, PO workflow, GRN posting/reversal, stock ledger, supplier invoice approval and payments |
+| Finance | — | Accounts, balanced ledger, expense workflow, advances and settlements |
 
 ### Reusable backend patterns
 
@@ -337,7 +359,7 @@ The application registers approximately 43 REST operations across the following 
 
 ## 7. Database model review
 
-Fifteen MongoDB collections are represented through Mongoose models:
+Twenty MongoDB collections are represented through Mongoose models:
 
 1. `User` — authentication, roles and account state.
 2. `Product` — catalogue and inventory master data.
@@ -354,6 +376,11 @@ Fifteen MongoDB collections are represented through Mongoose models:
 13. `LedgerEntry` — balanced vouchers, posting status and reversal references.
 14. `Expense` — expense approval, payment and ledger-posting records.
 15. `Advance` — supplier/employee/project advances, adjustments, refunds and outstanding balances.
+16. `Supplier` — verified supplier identity, tax, contact, banking and payment terms.
+17. `PurchaseOrder` — itemised purchasing, approval and receipt progress.
+18. `GoodsReceipt` — PO-linked receipt, batch/expiry and posting/reversal state.
+19. `StockMovement` — immutable product quantity changes and source-document traceability.
+20. `SupplierInvoice` — accounts payable, input tax, payment allocation and ledger references.
 
 All models use automatic creation and update timestamps.
 
@@ -378,6 +405,7 @@ All models use automatic creation and update timestamps.
 | `QuotationPrint` | Letterhead-friendly quotation print/PDF view |
 | `ChallanEditor` / `ChallanPrint` | Traceable delivery workflow and receiving document |
 | `InvoiceEditor` / `InvoicePrint` | Sales-tax calculation workflow and printable tax invoice |
+| `ProcurementEditor` | Shared purchase-order, goods-receipt and supplier-invoice editor |
 
 ## 9. UI, responsive design and accessibility
 
@@ -453,13 +481,13 @@ The new document editors include automatic focus placement, Escape-key closing a
 
 ## 12. Verification evidence from this review
 
-The following checks were completed through 8 September 2026:
+The following checks were completed through 24 October 2026:
 
 - Backend syntax check passed.
 - Production React/Vite build passed.
-- 1,600 frontend modules transformed successfully.
+- 1,612 frontend modules transformed successfully.
 - Production bundle generated successfully.
-- Seven automated business-rule/authorization tests passed.
+- Thirteen automated business-rule/authorization tests passed.
 - Authenticated tender and quotation API reads passed against the connected database.
 - Client dependency audit: 0 known vulnerabilities.
 - Server dependency audit: 0 known vulnerabilities.
@@ -488,8 +516,8 @@ These checks confirm build integrity, core document calculations and basic runti
 - Accountant/tax-adviser approval of the final sales-tax invoice wording and required registrations.
 - Automatic quotation-to-challan-to-invoice document conversion.
 - Tender document uploads and attachment storage.
-- Inventory stock-in, stock-out and movement ledger.
-- Batch-level quantities and expiry alerts.
+- Sales-delivery stock-out posting and customer/supplier return workflows.
+- Per-batch stock balances and automated expiry alerts.
 - Automatic invoice-to-receipt allocation, overdue automation and bank reconciliation.
 - Enquiry status controls and response notes.
 - Email notifications.
@@ -502,7 +530,7 @@ These checks confirm build integrity, core document calculations and basic runti
 - Some generic CRUD resources still accept broader schema-shaped request bodies; additional endpoint-specific validation is recommended.
 - Authorization is role-based, but permissions are not yet configurable per user or organisation.
 - Audit events are stored but do not yet have an admin viewer, retention policy or tamper-evident export.
-- Current automated tests cover tender, quotation, challan, invoice and authorization rules; broader API and browser regression coverage is still required.
+- Current automated tests cover tender, quotation, challan, invoice, finance, procurement calculations and authorization rules; broader API and browser regression coverage is still required.
 - Authentication still uses a session-storage bearer token; higher-risk production use should consider HTTP-only cookies, MFA and session revocation.
 - SEO still needs page-specific metadata, sitemap, robots configuration and structured data.
 
@@ -532,7 +560,7 @@ These checks confirm build integrity, core document calculations and basic runti
 
 ### Short CV description
 
-Designed and developed a responsive full-stack MERN platform for a medical and surgical supply company, combining a public product/RFQ website with a JWT-protected staff portal for inventory, tenders, quotations, delivery challans, sales-tax invoices, receivables and customer enquiries. Built the UI system from scratch, designed MongoDB schemas and REST APIs, and deployed the application to Vercel with MongoDB Atlas.
+Designed and developed a responsive full-stack MERN platform for a medical and surgical supply company, combining a public product/RFQ website with a JWT-protected staff portal for inventory, procurement, tenders, quotations, delivery challans, sales-tax invoices, payables, receivables and finance. Built the UI system from scratch, designed MongoDB schemas and REST APIs, and deployed the application to Vercel with MongoDB Atlas.
 
 ### CV bullet points
 
@@ -540,7 +568,7 @@ Designed and developed a responsive full-stack MERN platform for a medical and s
 - Developed a responsive corporate website with dynamic product catalogue, category filtering, product detail pages and a database-backed RFQ workflow.
 - Implemented JWT authentication, bcrypt password hashing, protected frontend/API routes, role-based authorization, rate limiting, Helmet security headers and centralized error handling.
 - Created an authenticated operations portal with product-wise tender evaluation, itemised quotations, traceable delivery challans, sales-tax invoices, print-ready documents, inventory monitoring, receivables and website enquiries.
-- Designed eleven MongoDB models and approximately 43 REST operations, including reusable CRUD architecture, atomic numbering, audit logging and server-calculated business metrics.
+- Designed twenty MongoDB models and more than 65 REST operations, including purchasing, stock movement, double-entry finance, atomic numbering, audit logging and server-calculated business metrics.
 - Configured Git/GitHub version control, Vercel serverless deployment, SPA routing and MongoDB Atlas integration.
 
 ### Compact one-line version
@@ -549,7 +577,7 @@ Built and deployed a custom MERN medical-supply platform featuring a responsive 
 
 ## 16. Portfolio/GitHub description
 
-Surgicare is a custom full-stack MERN platform for medical and surgical institutional supply. It combines a responsive public corporate website and dynamic product/RFQ experience with a secure operations portal covering inventory, tenders, quotations, delivery challans, sales-tax invoices, receivables and customer enquiries. The system uses React, Vite, Express, MongoDB, Mongoose, JWT authentication and a Vercel serverless deployment.
+Surgicare is a custom full-stack MERN platform for medical and surgical institutional supply. It combines a responsive public corporate website and dynamic product/RFQ experience with a secure operations portal covering inventory, procurement, tenders, quotations, delivery challans, sales-tax invoices, supplier payables, receivables and finance. The system uses React, Vite, Express, MongoDB, Mongoose, JWT authentication and a Vercel serverless deployment.
 
 ## 17. Interview talking points
 
@@ -567,7 +595,7 @@ MERN allowed the frontend, API and database models to share a JavaScript-based d
 
 ### What would be built next?
 
-The next phase would connect approved quotations to challans, invoices and receivables; add stock movements, audit-history UI, MFA/session controls, final accountant-approved tax wording and broader automated integration/end-to-end testing.
+The next phase would connect approved quotations to challans, invoices, stock-out and receivables; add batch-level expiry alerts, audit-history UI, MFA/session controls, final accountant-approved tax wording and broader automated integration/end-to-end testing.
 
 ## 18. Skills demonstrated
 

@@ -20,6 +20,7 @@ import AdminEnquiries from './pages/AdminEnquiries';
 import QuotationPrint from './pages/QuotationPrint';
 import AdminInvoices from './pages/AdminInvoices';
 import AdminFinance from './pages/AdminFinance';
+import AdminProcurement from './pages/AdminProcurement';
 import ChallanPrint from './pages/ChallanPrint';
 import InvoicePrint from './pages/InvoicePrint';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="invoices" element={<AdminInvoices />} />
         <Route path="invoices/:id/print" element={<InvoicePrint />} />
         <Route path="finance" element={<AdminFinance />} />
+        <Route path="procurement" element={<AdminProcurement />} />
         <Route path="payments" element={<AdminPayments />} />
         <Route path="enquiries" element={<AdminEnquiries />} />
       </Route>
