@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Brand from './Brand';
 
@@ -14,11 +14,14 @@ export default function Header() {
   useEffect(()=>{const onScroll=()=>setScrolled(window.scrollY>18);onScroll();window.addEventListener('scroll',onScroll,{passive:true});return()=>window.removeEventListener('scroll',onScroll)},[]);
   return (
     <header className={`site-header ${scrolled?'is-scrolled':''}`}>
+      <div className="utility-bar">
+        <div className="container utility-inner"><span>Institutional medical supply · Established 2016</span><span><ShieldCheck size={13}/> Procurement-focused support</span></div>
+      </div>
       <div className="container nav-wrap">
         <Link to="/" className="brand-link"><Brand /></Link>
         <nav className={open ? 'nav-links open' : 'nav-links'}>
           {links.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
-          <Link to="/staff-login" className="staff-link">Staff access</Link>
+          <Link to="/staff-login" className="staff-link">Secure portal</Link>
           <Link to="/contact" className="btn btn-sm">Request a Quote</Link>
         </nav>
         <button className="menu-btn" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open}>

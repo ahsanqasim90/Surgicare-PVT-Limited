@@ -1,6 +1,6 @@
 # Surgicare MERN Platform — Implementation Review & CV Portfolio Report
 
-**Review date:** 8 September 2026
+**Review date:** 24 October 2026
 
 **Repository:** https://github.com/ahsanqasim90/Surgicare-PVT-Limited
 
@@ -21,7 +21,7 @@ Surgicare is not only a static company website. It is a custom-designed, full-st
 
 The application was built with React, Vite, Node.js, Express, MongoDB and Mongoose. It includes real database persistence, JWT-based authentication, protected frontend and backend routes, responsive layouts, reusable UI components, REST APIs, input validation, security middleware and a production Vercel deployment.
 
-The current version is best described as a **production-deployed full-stack MVP**. Its core architecture and major workflows are implemented and working. Product-wise tender evaluation, itemised quotations, full delivery-challan records, sales-tax invoice generation, print/PDF-ready documents, role-based API authorization, atomic document numbering and backend audit logging are implemented. Advanced features such as automatic cross-document conversion, inventory transactions, MFA and verified final company content remain future work.
+The current version is best described as a **production-deployed full-stack operations and finance MVP**. Its core architecture and major workflows are implemented and working. Product-wise tender evaluation, itemised quotations, full delivery-challan records, sales-tax invoice generation, print/PDF-ready documents, a double-entry daily ledger, expense approvals, advance-payment settlement, role-based API authorization, atomic document numbering and backend audit logging are implemented. Advanced features such as automatic cross-document conversion, inventory transactions, MFA and verified final company content remain future work.
 
 ## 2. What is fully implemented
 
@@ -62,6 +62,8 @@ The current version is best described as a **production-deployed full-stack MVP*
 - Browser print/PDF-ready quotation view.
 - Itemised delivery challan editor and print/PDF-ready dispatch document.
 - Sales-tax invoice editor with tax identity fields, server calculations and print/PDF-ready output.
+- Finance control centre with daily ledger, chart of accounts, expense approvals and advance-payment settlement.
+- Balanced debit/credit validation, controlled posting and reversal-ready ledger architecture.
 - Role-based API authorization and role-aware sidebar navigation.
 - Staff mutation audit logs.
 - Atomic quotation and delivery-challan number generation.
@@ -103,6 +105,7 @@ The current version is best described as a **production-deployed full-stack MVP*
 | `/admin/quotations` | Quotations | Itemised create/edit workflow, calculated totals, atomic numbering and print/PDF-ready view | Implemented |
 | `/admin/challans` | Delivery | Itemised challan create/edit, batch/expiry traceability, dispatch/receipt data and print view | Implemented |
 | `/admin/invoices` | Tax invoices | Itemised create/edit, NTN/STRN fields, server-calculated tax totals, atomic numbering and print view | Implemented; final legal template review required |
+| `/admin/finance` | Finance control centre | Chart of accounts, daily double-entry ledger, cash/bank balances, expenses, approvals, advances and settlements | Implemented |
 | `/admin/payments` | Receivables | Amount, received amount, due date and derived payment status | MVP implemented |
 | `/admin/enquiries` | Customer enquiries | Displays RFQs submitted from the public website | Implemented |
 | `*` | Unknown route | Custom page-not-found response | Implemented |
@@ -334,7 +337,7 @@ The application registers approximately 43 REST operations across the following 
 
 ## 7. Database model review
 
-Eleven MongoDB collections are represented through Mongoose models:
+Fifteen MongoDB collections are represented through Mongoose models:
 
 1. `User` — authentication, roles and account state.
 2. `Product` — catalogue and inventory master data.
@@ -347,6 +350,10 @@ Eleven MongoDB collections are represented through Mongoose models:
 9. `AuditLog` — staff mutation history and actor/request metadata.
 10. `Counter` — atomic document-number sequences.
 11. `SalesTaxInvoice` — buyer/tax registration data, taxable line items and invoice totals.
+12. `FinanceAccount` — chart of accounts, cash/bank accounts and opening balances.
+13. `LedgerEntry` — balanced vouchers, posting status and reversal references.
+14. `Expense` — expense approval, payment and ledger-posting records.
+15. `Advance` — supplier/employee/project advances, adjustments, refunds and outstanding balances.
 
 All models use automatic creation and update timestamps.
 
@@ -483,7 +490,7 @@ These checks confirm build integrity, core document calculations and basic runti
 - Tender document uploads and attachment storage.
 - Inventory stock-in, stock-out and movement ledger.
 - Batch-level quantities and expiry alerts.
-- Payment allocation, overdue automation and reconciliation history.
+- Automatic invoice-to-receipt allocation, overdue automation and bank reconciliation.
 - Enquiry status controls and response notes.
 - Email notifications.
 - Audit-history user interface and retention/export controls.

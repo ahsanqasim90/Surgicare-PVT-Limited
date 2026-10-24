@@ -5,6 +5,7 @@ import {quotationPayload} from '../routes/quotationRoutes.js';
 import {challanPayload} from '../routes/challanRoutes.js';
 import {invoicePayload} from '../routes/invoiceRoutes.js';
 import {authorize} from '../middleware/authorize.js';
+import {calculateLedgerAmounts,deriveAdvanceStatus} from '../routes/financeRoutes.js';
 
 const user={_id:'507f1f77bcf86cd799439011'};
 
@@ -69,4 +70,20 @@ test('role middleware blocks users outside the allowed business function',()=>{
   middleware({user:{role:'Inventory'}},{status(code){statusCode=code;return this},json(value){response=value}},()=>assert.fail('Unauthorized role reached next middleware'));
   assert.equal(statusCode,403);
   assert.match(response.message,/permission/i);
+});
+
+test('finance ledger accepts balanced debit and credit lines',()=>{
+  const result=calculateLedgerAmounts([{account:'a',debit:2500,credit:0},{account:'b',debit:0,credit:2500}]);
+  assert.equal(result.totalDebit,2500);
+  assert.equal(result.totalCredit,2500);
+});
+
+test('finance ledger rejects an unbalanced voucher',()=>{
+  assert.throws(()=>calculateLedgerAmounts([{account:'a',debit:2500,credit:0},{account:'b',debit:0,credit:2000}]),/not balanced/i);
+});
+
+test('advance settlement derives partial, settled and refunded states',()=>{
+  assert.deepEqual(deriveAdvanceStatus(10000,3000,0),{status:'Partially Settled',outstandingAmount:7000});
+  assert.deepEqual(deriveAdvanceStatus(10000,10000,0),{status:'Settled',outstandingAmount:0});
+  assert.deepEqual(deriveAdvanceStatus(10000,0,10000),{status:'Refunded',outstandingAmount:0});
 });
