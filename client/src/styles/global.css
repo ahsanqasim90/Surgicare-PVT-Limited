@@ -91,6 +91,7 @@ body{background:var(--paper)}
 .medical-3d-scene{width:100%;height:100%;position:relative;cursor:crosshair;touch-action:pan-y}
 .medical-3d-scene canvas{display:block;width:100%;height:100%;filter:drop-shadow(0 30px 35px rgba(0,0,0,.38))}
 .medical-3d-fallback{width:100%;height:100%;object-fit:cover}
+.scene-loader{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 44%,rgba(43,213,173,.22),transparent 32%)}.scene-loader span{position:absolute;border-radius:18px;background:linear-gradient(145deg,#52d8b8,#087c70);box-shadow:inset 2px 2px 3px rgba(255,255,255,.35),0 24px 55px rgba(3,211,161,.22)}.scene-loader span:first-child{width:82px;height:270px}.scene-loader span:last-child{width:230px;height:82px}.scene-loader:after{content:"LOADING INTERACTIVE 3D";position:absolute;bottom:108px;color:rgba(211,255,244,.62);font-size:9px;font-weight:800;letter-spacing:.16em}
 .scene-live-label{position:absolute;top:24px;left:24px;z-index:3;display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(177,255,235,.24);border-radius:99px;background:rgba(2,26,31,.48);backdrop-filter:blur(14px);color:#c8fff1;font-size:10px;font-weight:800;letter-spacing:.16em}
 .scene-live-label i{width:7px;height:7px;border-radius:50%;background:#54f0c5;box-shadow:0 0 0 5px rgba(84,240,197,.12),0 0 18px #54f0c5;animation:livePulse 1.8s ease-in-out infinite}
 .scene-instruction{position:absolute;top:28px;right:26px;z-index:3;color:rgba(222,255,247,.55);font-size:10px;letter-spacing:.08em;text-transform:uppercase}

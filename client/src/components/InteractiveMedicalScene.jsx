@@ -27,14 +27,23 @@ export default function InteractiveMedicalScene(){
     scene.add(world);
     const glass=new THREE.MeshPhysicalMaterial({color:0x22c9a0,metalness:.08,roughness:.12,transmission:.62,thickness:1.3,transparent:true,opacity:.94,clearcoat:1,clearcoatRoughness:.08,emissive:0x063f35,emissiveIntensity:.7});
     const edgeMaterial=new THREE.MeshStandardMaterial({color:0xc4fff0,metalness:.55,roughness:.22,emissive:0x0d6959,emissiveIntensity:.55});
+    const backingMaterial=new THREE.MeshPhysicalMaterial({color:0x062f35,metalness:.72,roughness:.18,clearcoat:1,clearcoatRoughness:.12,emissive:0x073d3c,emissiveIntensity:.45});
     const cross=new THREE.Group();
+    const backingVertical=new THREE.Mesh(new RoundedBoxGeometry(1.48,4.48,.34,6,.24),backingMaterial);
+    const backingHorizontal=new THREE.Mesh(new RoundedBoxGeometry(3.88,1.48,.34,6,.24),backingMaterial);
+    backingVertical.position.z=-.25;backingHorizontal.position.z=-.25;
     const vertical=new THREE.Mesh(new RoundedBoxGeometry(1.25,4.25,.72,6,.2),glass);
     const horizontal=new THREE.Mesh(new RoundedBoxGeometry(3.65,1.25,.72,6,.2),glass);
     vertical.castShadow=true;horizontal.castShadow=true;
-    cross.add(vertical,horizontal);
+    cross.add(backingVertical,backingHorizontal,vertical,horizontal);
     cross.add(new THREE.Mesh(new THREE.IcosahedronGeometry(.54,3),edgeMaterial));
-    cross.rotation.set(-.08,.38,-.06);
+    cross.rotation.set(-.04,.14,-.025);
     world.add(cross);
+
+    const haloMaterial=new THREE.MeshPhysicalMaterial({color:0x0d8e7d,metalness:.65,roughness:.2,transparent:true,opacity:.45,emissive:0x0b5149,emissiveIntensity:.55});
+    const halo=new THREE.Mesh(new THREE.TorusGeometry(2.72,.1,22,140),haloMaterial);
+    halo.position.z=-.78;
+    world.add(halo);
 
     const rings=new THREE.Group();
     const ringMaterial=new THREE.MeshStandardMaterial({color:0x7de9d0,metalness:.7,roughness:.2,transparent:true,opacity:.72});
@@ -88,7 +97,8 @@ export default function InteractiveMedicalScene(){
       const elapsed=clock.getElapsedTime();
       pointer.x+=(pointerTarget.x-pointer.x)*.045;pointer.y+=(pointerTarget.y-pointer.y)*.045;
       world.rotation.y=pointer.x*.22;world.rotation.x=-pointer.y*.12;
-      cross.rotation.y=.38+pointer.x*.32+(reduceMotion?0:elapsed*.13);cross.rotation.x=-.08-pointer.y*.18;cross.position.y=reduceMotion?0:Math.sin(elapsed*.9)*.13;
+      cross.rotation.y=.14+pointer.x*.18+(reduceMotion?0:Math.sin(elapsed*.55)*.07);cross.rotation.x=-.04-pointer.y*.1+(reduceMotion?0:Math.cos(elapsed*.45)*.025);cross.rotation.z=-.025+pointer.x*.025;cross.position.y=reduceMotion?0:Math.sin(elapsed*.9)*.1;
+      halo.rotation.z=reduceMotion?0:elapsed*.045;
       rings.rotation.z=reduceMotion?0:elapsed*.055;rings.rotation.y=pointer.x*.2+(reduceMotion?0:-elapsed*.035);particles.rotation.y=reduceMotion?0:elapsed*.018;
       nodes.forEach((node,index)=>node.scale.setScalar(1+(reduceMotion?0:Math.sin(elapsed*2+index)*.16)));
       camera.position.x+=(pointer.x*.34-camera.position.x)*.025;camera.position.y+=(.25+pointer.y*.24-camera.position.y)*.025;camera.lookAt(0,0,0);
@@ -104,7 +114,7 @@ export default function InteractiveMedicalScene(){
   },[]);
 
   return <div ref={mountRef} className="medical-3d-scene">
-    {!webglReady&&<img className="medical-3d-fallback" src="/images/3d/medical-supply-hero-3d.png" alt="Surgicare medical supply collection"/>}
+    {!webglReady&&<div className="scene-loader" role="img" aria-label="Surgicare medical cross"><span/><span/></div>}
     <div className="scene-live-label"><i/> LIVE 3D EXPERIENCE</div>
     <div className="scene-instruction">Move your cursor to explore</div>
   </div>;
