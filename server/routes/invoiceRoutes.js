@@ -23,7 +23,7 @@ export function invoicePayload(body,user){
   return {
     invoiceDate:body.invoiceDate||new Date(),dueDate:body.dueDate||null,status:statuses.includes(body.status)?body.status:'Draft',
     clientName:text(body.clientName,240),clientAddress:text(body.clientAddress,1000),contactPerson:text(body.contactPerson,160),
-    sellerNTN:text(body.sellerNTN,80),sellerSTRN:text(body.sellerSTRN,80),buyerNTN:text(body.buyerNTN,80),buyerSTRN:text(body.buyerSTRN,80),
+    sellerNTN:text(body.sellerNTN||'6054812-8',80),sellerSTRN:text(body.sellerSTRN,80),buyerNTN:text(body.buyerNTN,80),buyerSTRN:text(body.buyerSTRN,80),
     purchaseOrderNumber:text(body.purchaseOrderNumber,160),reference:text(body.reference,160),
     ...(body.quotation?{quotation:body.quotation}:{quotation:null}),...(body.challan?{challan:body.challan}:{challan:null}),items,
     subtotal:Number(subtotal.toFixed(2)),discountTotal:Number(discountTotal.toFixed(2)),taxableTotal:Number(taxableTotal.toFixed(2)),

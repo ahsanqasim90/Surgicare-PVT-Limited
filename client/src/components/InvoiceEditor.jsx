@@ -1,5 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {Plus,Trash2,X} from 'lucide-react';
+import {companyDetails} from '../data/company';
 
 const blankItem=()=>({description:'',brand:'',unit:'No.',quantity:1,unitRate:0,discount:0,taxRate:0});
 const dateValue=value=>value?new Date(value).toISOString().slice(0,10):'';
@@ -9,7 +10,7 @@ const calculate=item=>{const subtotal=Number(item.quantity||0)*Number(item.unitR
 export default function InvoiceEditor({record,onClose,onSave}){
   const [form,setForm]=useState(() => ({
     invoiceNumber:record?.invoiceNumber||'',invoiceDate:dateValue(record?.invoiceDate)||new Date().toISOString().slice(0,10),dueDate:dateValue(record?.dueDate),status:record?.status||'Draft',
-    clientName:record?.clientName||'',clientAddress:record?.clientAddress||'',contactPerson:record?.contactPerson||'',sellerNTN:record?.sellerNTN||'',sellerSTRN:record?.sellerSTRN||'',buyerNTN:record?.buyerNTN||'',buyerSTRN:record?.buyerSTRN||'',
+    clientName:record?.clientName||'',clientAddress:record?.clientAddress||'',contactPerson:record?.contactPerson||'',sellerNTN:record?.sellerNTN||companyDetails.ntn,sellerSTRN:record?.sellerSTRN||'',buyerNTN:record?.buyerNTN||'',buyerSTRN:record?.buyerSTRN||'',
     purchaseOrderNumber:record?.purchaseOrderNumber||'',reference:record?.reference||'',paymentTerms:record?.paymentTerms||'',notes:record?.notes||'',
     items:record?.items?.length?record.items.map(item=>({...item})):[blankItem()]
   }));

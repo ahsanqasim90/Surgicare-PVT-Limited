@@ -2,6 +2,7 @@ import { NavLink, Link } from 'react-router-dom';
 import { Menu, X, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Brand from './Brand';
+import {companyDetails,phoneHref} from '../data/company';
 
 const links = [
   ['/', 'Home'], ['/about', 'About'], ['/products', 'Products'],
@@ -15,7 +16,7 @@ export default function Header() {
   return (
     <header className={`site-header ${scrolled?'is-scrolled':''}`}>
       <div className="utility-bar">
-        <div className="container utility-inner"><span>Institutional medical supply · Established 2016</span><span><ShieldCheck size={13}/> Procurement-focused support</span></div>
+        <div className="container utility-inner"><span>Institutional medical supply · Established {companyDetails.established}</span><a href={phoneHref(companyDetails.phones[0])}><ShieldCheck size={13}/> {companyDetails.phones[0]}</a></div>
       </div>
       <div className="container nav-wrap">
         <Link to="/" className="brand-link"><Brand /></Link>
